@@ -132,6 +132,8 @@ UI5Downport/
       Main.view.xml               MDC FilterBar + "In WIP" Switch (Toolbar) + multi-select
                                   MDC Table with mdc:actions (Active/Passive Work buttons)
       ObjectPage.view.xml         Page > ObjectPageLayout (useIconTabBar) > ObjectPageHeader
+      ActiveWork.view.xml         Plain sap.m.Table filtered view (route "activework"),
+                                  reached after the Main "Active Work" action completes
     controller/
       Main.controller.js          FilterBar/Table wiring; onProductPress -> navTo("object").
                                   Holds "In WIP" state in an unnamed-view "ui" JSON model
@@ -141,6 +143,7 @@ UI5Downport/
                                   Promise.all -> summary toast, then clearSelection().
       ObjectPage.controller.js    Reads HeaderInfo + Facets; builds header; creates one
                                   ObjectPageSection per ReferenceFacet, each hosting a Block
+      ActiveWork.controller.js    Nav only: onNavBack -> "main"; onProductPress -> "object"
     delegate/                     Custom MDC delegates (the "no fe.macros" route)
       TableDelegate.js            MDC Table over OData V4 Products. updateBindingInfo reads
                                   ui>/inWIP and (when on) pushes WIP_FILTER (UnitsOnOrder gt 0)
@@ -238,7 +241,11 @@ row's `productId` + context path), disables both buttons, then `Promise.all`s
 the jobs and shows a summary toast (`"… done: N succeeded, M failed"`) before
 re-enabling and clearing the selection. So when you swap in the real runner
 (§7 above), these buttons light up too — no extra wiring. Verified live: 2
-selected rows → 2 runner jobs → `"Passive Work done: 2 succeeded"`.
+selected rows → 2 runner jobs → `"Passive Work done: 2 succeeded"`. **Active Work
+additionally navigates** (after all jobs finish) to the `activework` route — a
+filtered Products view (`view/ActiveWork.*`, "Low Stock" = `UnitsInStock < 20`,
+filter declared inline on the sap.m.Table items binding). `_runForSelected`
+takes an optional `fnDone` callback for exactly this; Passive Work passes none.
 
 ### The custom "In WIP" switch filter (NOT an MDC FilterField)
 MDC `FilterBar` only hosts `FilterField`s, so "In WIP" is a plain `sap.m.Switch`

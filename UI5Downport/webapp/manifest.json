@@ -74,6 +74,11 @@
 					"name": "object",
 					"pattern": "Products/{productId}",
 					"target": "object"
+				},
+				{
+					"name": "activework",
+					"pattern": "ActiveWork",
+					"target": "activework"
 				}
 			],
 			"targets": {
@@ -84,6 +89,10 @@
 				"object": {
 					"id": "objectPageView",
 					"name": "ObjectPage"
+				},
+				"activework": {
+					"id": "activeWorkView",
+					"name": "ActiveWork"
 				}
 			}
 		},

@@ -43,8 +43,13 @@ sap.ui.define([
 		},
 
 		// ---- Toolbar actions over the multi-selected rows ------------------------
+		// Active Work: once the runner finishes for every selected row, navigate to
+		// the filtered "Active Work" view (Low Stock products, UnitsInStock < 20).
 		onActiveWork: function () {
-			this._runForSelected("downport.action.ActiveWork", "Active Work");
+			var that = this;
+			this._runForSelected("downport.action.ActiveWork", "Active Work", function () {
+				that.getOwnerComponent().getRouter().navTo("activework");
+			});
 		},
 
 		onPassiveWork: function () {
@@ -54,7 +59,7 @@ sap.ui.define([
 		// Fire the async runner once per selected row. Each run triggers + polls
 		// independently (see util/AsyncActionRunner); we wait for all of them and
 		// report a summary. Buttons are disabled while the batch is in flight.
-		_runForSelected: function (sActionId, sLabel) {
+		_runForSelected: function (sActionId, sLabel, fnDone) {
 			var oTable = this.byId("productsTable");
 			var aContexts = oTable.getSelectedContexts();
 			if (!aContexts.length) {
@@ -89,6 +94,9 @@ sap.ui.define([
 					oTable.clearSelection();
 				}
 				that._setActionsEnabled(true);
+				if (typeof fnDone === "function") {
+					fnDone(aResults);
+				}
 			});
 		},
 
