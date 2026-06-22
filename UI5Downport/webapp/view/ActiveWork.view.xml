@@ -2,46 +2,31 @@
 	controllerName="downport.controller.ActiveWork"
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns="sap.m"
+	xmlns:annotation="downport.annotation"
+	xmlns:mdcTable="sap.ui.mdc.table"
 	displayBlock="true"
 	height="100%">
-	<!-- Navigation target reached after the Main page's "Active Work" action runner
-	     finishes. It shows a FILTERED slice of Products: "Low Stock" — products whose
-	     UnitsInStock is below the threshold. The filter lives on the table's items
-	     binding (applied in the controller), so this is a plain freestyle sap.m.Table,
-	     no MDC delegate needed. Back button returns to the Main page. -->
 	<Page id="activeWorkPage"
 		title="Active Work — Low Stock Products"
 		showNavButton="true"
 		navButtonPress=".onNavBack"
 		class="sapUiContentPadding">
 		<content>
-			<Table id="lowStockTable"
-				growing="true"
-				growingThreshold="20"
-				items="{path: '/Products', parameters: {$count: true}, filters: [{path: 'UnitsInStock', operator: 'LT', value1: 20}]}">
-				<headerToolbar>
-					<OverflowToolbar>
-						<Title id="lowStockTitle" text="Low Stock (UnitsInStock &lt; 20)"/>
-						<ToolbarSpacer/>
-					</OverflowToolbar>
-				</headerToolbar>
-				<columns>
-					<Column width="5rem"><header><Text text="ID"/></header></Column>
-					<Column><header><Text text="Product Name"/></header></Column>
-					<Column hAlign="End" width="7rem"><header><Text text="In Stock"/></header></Column>
-					<Column hAlign="End" width="7rem"><header><Text text="On Order"/></header></Column>
-					<Column hAlign="End" width="7rem"><header><Text text="Reorder Lvl"/></header></Column>
-					<Column hAlign="End" width="6rem"><header><Text text="Price"/></header></Column>
-				</columns>
-				<ColumnListItem type="Active" press=".onProductPress">
-					<Text text="{ProductID}"/>
-					<Text text="{ProductName}"/>
-					<Text text="{UnitsInStock}"/>
-					<Text text="{UnitsOnOrder}"/>
-					<Text text="{ReorderLevel}"/>
-					<Text text="{UnitPrice}"/>
-				</ColumnListItem>
-			</Table>
+			<annotation:AnnotationTable
+				id="lowStockTable"
+				contextPath="/Products"
+				metaPath="@com.sap.vocabularies.UI.v1.LineItem#ActiveWork"
+				selectionVariantPath="@com.sap.vocabularies.UI.v1.SelectionVariant#LowStock"
+				collectionPath="/Products"
+				header="Low Stock"
+				showRowCount="true"
+				autoBindOnInit="true"
+				p13nMode="Column,Sort"
+				rowPress=".onProductPress">
+				<annotation:type>
+					<mdcTable:ResponsiveTableType growingMode="Scroll"/>
+				</annotation:type>
+			</annotation:AnnotationTable>
 		</content>
 	</Page>
 </mvc:View>

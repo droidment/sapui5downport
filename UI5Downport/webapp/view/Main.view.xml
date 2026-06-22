@@ -2,239 +2,43 @@
 	controllerName="downport.controller.Main"
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns="sap.m"
-	xmlns:mdc="sap.ui.mdc"
-	xmlns:mdcField="sap.ui.mdc.field"
+	xmlns:annotation="downport.annotation"
 	xmlns:mdcTable="sap.ui.mdc.table"
-	xmlns:mdcat="sap.ui.mdc.actiontoolbar"
-	xmlns:mdcvh="sap.ui.mdc.valuehelp"
-	xmlns:mdcvc="sap.ui.mdc.valuehelp.content"
-	xmlns:vhfb="sap.ui.mdc.filterbar.vh"
 	displayBlock="true"
 	height="100%">
-	<Page id="page" title="MDC FilterBar + Table + ValueHelps on OpenUI5 1.120.30 (OData V4 / Northwind)" class="sapUiContentPadding">
+	<Page id="page" title="Annotation-Driven Products" class="sapUiContentPadding">
 		<content>
-				<!-- ===================== FILTER BAR ===================== -->
-				<mdc:FilterBar id="filterBar"
-					p13nMode="Value"
-					delegate="{name: 'downport/delegate/FilterBarMainDelegate', payload: {}}">
-					<mdc:filterItems>
-
-						<!-- Product Name (free text + ValueHelp over Products) -->
-						<mdc:FilterField id="ffProductName"
-							label="Product Name"
-							propertyKey="ProductName"
-							dataType="sap.ui.model.odata.type.String"
-							conditions="{$filters>/conditions/ProductName}"
-							valueHelp="vhProductName">
-							<mdc:dependents>
-								<mdc:ValueHelp id="vhProductName"
-									delegate="{name: 'downport/delegate/ValueHelpDelegate', payload: {}}">
-									<mdc:typeahead>
-										<mdcvh:Popover>
-											<mdcvc:MTable keyPath="ProductName" descriptionPath="ProductName" filterFields="*ProductName*">
-												<mdcvc:table>
-													<Table items="{path: '/Products', length: 10}" width="28rem">
-														<columns>
-															<Column><header><Text text="Product"/></header></Column>
-															<Column><header><Text text="Qty per Unit"/></header></Column>
-														</columns>
-														<ColumnListItem type="Active">
-															<Text text="{ProductName}"/>
-															<Text text="{QuantityPerUnit}"/>
-														</ColumnListItem>
-													</Table>
-												</mdcvc:table>
-											</mdcvc:MTable>
-										</mdcvh:Popover>
-									</mdc:typeahead>
-									<mdc:dialog>
-										<mdcvh:Dialog title="Select a Product (Northwind V4)">
-											<mdcvc:MTable keyPath="ProductName" descriptionPath="ProductName" filterFields="*ProductName,QuantityPerUnit*">
-												<mdcvc:filterBar>
-													<vhfb:FilterBar delegate="{name: 'downport/delegate/FilterBarDelegate', payload: {}}"/>
-												</mdcvc:filterBar>
-												<mdcvc:table>
-													<!-- length:100 (no growing): MDC forces extended change detection on
-													     this inner table and its filter requests getContexts(0,100);
-													     growing's paged getContexts(0,20) would collide and hang the
-													     dialog on "Please wait". -->
-													<Table items="{path: '/Products', length: 100}" width="100%">
-														<columns>
-															<Column width="5rem"><header><Text text="ID"/></header></Column>
-															<Column><header><Text text="Product Name"/></header></Column>
-															<Column><header><Text text="Qty per Unit"/></header></Column>
-															<Column hAlign="End"><header><Text text="Price"/></header></Column>
-														</columns>
-														<ColumnListItem type="Active">
-															<Text text="{ProductID}"/>
-															<Text text="{ProductName}"/>
-															<Text text="{QuantityPerUnit}"/>
-															<Text text="{UnitPrice}"/>
-														</ColumnListItem>
-													</Table>
-												</mdcvc:table>
-											</mdcvc:MTable>
-										</mdcvh:Dialog>
-									</mdc:dialog>
-								</mdc:ValueHelp>
-							</mdc:dependents>
-						</mdc:FilterField>
-
-						<!-- Category (key CategoryID) — ANNOTATION-DRIVEN value help.
-						     The MTables below are intentionally EMPTY: no keyPath,
-						     descriptionPath, filterFields, columns or table binding.
-						     ValueListHelpDelegate.retrieveContent reads the
-						     com.sap.vocabularies.Common.v1.ValueList annotation on
-						     /Products/CategoryID (via requestValueListInfo) and builds
-						     all of that at runtime. -->
-						<mdc:FilterField id="ffCategory"
-							label="Category"
-							propertyKey="CategoryID"
-							dataType="sap.ui.model.odata.type.Int32"
-							display="DescriptionValue"
-							conditions="{$filters>/conditions/CategoryID}"
-							valueHelp="vhCategoryAnno">
-							<mdc:dependents>
-								<mdc:ValueHelp id="vhCategoryAnno"
-									delegate="{name: 'downport/delegate/ValueListHelpDelegate', payload: {propertyPath: '/Products/CategoryID'}}">
-									<mdc:typeahead>
-										<mdcvh:Popover>
-											<mdcvc:MTable/>
-										</mdcvh:Popover>
-									</mdc:typeahead>
-									<mdc:dialog>
-										<mdcvh:Dialog title="Select a Category (from ValueList annotation)">
-											<mdcvc:MTable/>
-										</mdcvh:Dialog>
-									</mdc:dialog>
-								</mdc:ValueHelp>
-							</mdc:dependents>
-						</mdc:FilterField>
-
-						<!-- Supplier (key SupplierID, ValueHelp over Suppliers) -->
-						<mdc:FilterField id="ffSupplier"
-							label="Supplier"
-							propertyKey="SupplierID"
-							dataType="sap.ui.model.odata.type.Int32"
-							display="DescriptionValue"
-							conditions="{$filters>/conditions/SupplierID}"
-							valueHelp="vhSupplier">
-							<mdc:dependents>
-								<mdc:ValueHelp id="vhSupplier"
-									delegate="{name: 'downport/delegate/ValueHelpDelegate', payload: {}}">
-									<mdc:typeahead>
-										<mdcvh:Popover>
-											<mdcvc:MTable keyPath="SupplierID" descriptionPath="CompanyName" filterFields="*CompanyName*">
-												<mdcvc:table>
-													<Table items="{path: '/Suppliers', length: 100}" width="30rem">
-														<columns>
-															<Column width="4rem"><header><Text text="ID"/></header></Column>
-															<Column><header><Text text="Company"/></header></Column>
-														</columns>
-														<ColumnListItem type="Active">
-															<Text text="{SupplierID}"/>
-															<Text text="{CompanyName}"/>
-														</ColumnListItem>
-													</Table>
-												</mdcvc:table>
-											</mdcvc:MTable>
-										</mdcvh:Popover>
-									</mdc:typeahead>
-									<mdc:dialog>
-										<mdcvh:Dialog title="Select a Supplier (Northwind V4)">
-											<mdcvc:MTable keyPath="SupplierID" descriptionPath="CompanyName" filterFields="*CompanyName,City,Country*">
-												<mdcvc:filterBar>
-													<vhfb:FilterBar delegate="{name: 'downport/delegate/FilterBarDelegate', payload: {}}"/>
-												</mdcvc:filterBar>
-												<mdcvc:table>
-													<Table items="{path: '/Suppliers', length: 100}" width="100%">
-														<columns>
-															<Column width="5rem"><header><Text text="ID"/></header></Column>
-															<Column><header><Text text="Company Name"/></header></Column>
-															<Column><header><Text text="City"/></header></Column>
-															<Column><header><Text text="Country"/></header></Column>
-														</columns>
-														<ColumnListItem type="Active">
-															<Text text="{SupplierID}"/>
-															<Text text="{CompanyName}"/>
-															<Text text="{City}"/>
-															<Text text="{Country}"/>
-														</ColumnListItem>
-													</Table>
-												</mdcvc:table>
-											</mdcvc:MTable>
-										</mdcvh:Dialog>
-									</mdc:dialog>
-								</mdc:ValueHelp>
-							</mdc:dependents>
-						</mdc:FilterField>
-
-					</mdc:filterItems>
-				</mdc:FilterBar>
-
-				<!-- ===================== CUSTOM FILTER ROW =====================
-				     "In WIP" is NOT an MDC FilterField (MDC FilterBar only hosts
-				     FilterFields). It is a plain Switch whose state lives in the
-				     unnamed-view "ui" JSON model. On search the TableDelegate reads
-				     ui>/inWIP and appends a custom condition to the $filter query.
-				     Toggling re-triggers the FilterBar search so it applies at once. -->
-				<Toolbar id="customFilters" class="sapUiSmallMarginTop">
-					<Label text="In WIP" labelFor="swInWIP"/>
-					<Switch id="swInWIP" state="{ui>/inWIP}" change=".onWIPChange"
-						customTextOn="WIP" customTextOff="All"/>
-					<ToolbarSpacer/>
-				</Toolbar>
-
-				<!-- ===================== RESULTS TABLE ===================== -->
-				<mdc:Table id="productsTable"
-					header="Products"
-					showRowCount="true"
-					autoBindOnInit="true"
-					p13nMode="Column,Sort"
-					selectionMode="Multi"
-					threshold="50"
-					filter="filterBar"
-					rowPress=".onProductPress"
-					class="sapUiSmallMarginTop"
-					delegate="{name: 'downport/delegate/TableDelegate', payload: {collectionPath: '/Products'}}">
-					<mdc:type>
-						<mdcTable:ResponsiveTableType growingMode="Scroll"/>
-					</mdc:type>
-					<!-- Toolbar actions. Both operate on the multi-selected rows and run
-					     the async runner once per selected item (Passive Work as the
-					     spec'd example; Active Work mirrors it with a different action id). -->
-					<mdc:actions>
-						<mdcat:ActionToolbarAction>
-							<Button id="btnActiveWork" text="Active Work" press=".onActiveWork"/>
-						</mdcat:ActionToolbarAction>
-						<mdcat:ActionToolbarAction>
-							<Button id="btnPassiveWork" text="Passive Work" type="Emphasized" press=".onPassiveWork"/>
-						</mdcat:ActionToolbarAction>
-					</mdc:actions>
-					<mdc:columns>
-						<mdcTable:Column header="ID" propertyKey="ProductID" width="5rem">
-							<Text text="{ProductID}"/>
-						</mdcTable:Column>
-						<mdcTable:Column header="Product Name" propertyKey="ProductName">
-							<Text text="{ProductName}"/>
-						</mdcTable:Column>
-						<mdcTable:Column header="Qty per Unit" propertyKey="QuantityPerUnit">
-							<Text text="{QuantityPerUnit}"/>
-						</mdcTable:Column>
-						<mdcTable:Column header="Category" propertyKey="CategoryID" width="6rem">
-							<Text text="{CategoryID}"/>
-						</mdcTable:Column>
-						<mdcTable:Column header="Supplier" propertyKey="SupplierID" width="6rem">
-							<Text text="{SupplierID}"/>
-						</mdcTable:Column>
-						<mdcTable:Column header="Price" propertyKey="UnitPrice" hAlign="End" width="6rem">
-							<Text text="{UnitPrice}"/>
-						</mdcTable:Column>
-						<mdcTable:Column header="In Stock" propertyKey="UnitsInStock" hAlign="End" width="6rem">
-							<Text text="{UnitsInStock}"/>
-						</mdcTable:Column>
-					</mdc:columns>
-				</mdc:Table>
-			</content>
-		</Page>
+			<annotation:AnnotationFilterBar
+				id="filterBar"
+				contextPath="/Products"
+				metaPath="@com.sap.vocabularies.UI.v1.SelectionFields"
+				p13nMode="Value"/>
+			<Toolbar class="sapUiSmallMarginTop">
+				<annotation:SelectionVariantFilter
+					contextPath="/Products"
+					metaPath="@com.sap.vocabularies.UI.v1.SelectionVariant#InWIP"
+					filterBar="filterBar"/>
+				<ToolbarSpacer/>
+			</Toolbar>
+			<annotation:AnnotationTable
+				id="productsTable"
+				contextPath="/Products"
+				metaPath="@com.sap.vocabularies.UI.v1.LineItem"
+				collectionPath="/Products"
+				header="Products"
+				showRowCount="true"
+				autoBindOnInit="true"
+				p13nMode="Column,Sort"
+				selectionMode="Multi"
+				threshold="50"
+				filter="filterBar"
+				rowPress=".onProductPress"
+				annotationAction=".onAnnotationAction"
+				class="sapUiSmallMarginTop">
+				<annotation:type>
+					<mdcTable:ResponsiveTableType growingMode="Scroll"/>
+				</annotation:type>
+			</annotation:AnnotationTable>
+		</content>
+	</Page>
 </mvc:View>
