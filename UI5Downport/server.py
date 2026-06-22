@@ -39,6 +39,15 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=WEBROOT, **kwargs)
 
+    def end_headers(self):
+        # Dev-only: never let the browser cache the static app sources (esp.
+        # localService/annotations.xml). Without this the V4 ODataMetaModel keeps
+        # re-reading a stale, heuristically-cached annotation document after edits.
+        # The proxy branch writes its own end_headers via send_header/end_headers
+        # below, so this applies to every response uniformly, which is fine for dev.
+        self.send_header("Cache-Control", "no-store, must-revalidate")
+        super().end_headers()
+
     def _proxy(self, method):
         upstream_url = UPSTREAM + self.path[len(PROXY_PREFIX):]
         length = int(self.headers.get("Content-Length", 0) or 0)

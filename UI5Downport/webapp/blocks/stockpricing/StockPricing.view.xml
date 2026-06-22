@@ -1,0 +1,8 @@
+<mvc:View
+	controllerName="downport.blocks.stockpricing.StockPricing"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:f="sap.ui.layout.form"
+	xmlns="sap.m">
+	<!-- Empty shell, filled by the controller from FieldGroup#Stock. -->
+	<f:SimpleForm id="form" layout="ColumnLayout" editable="false" columnsM="1" columnsL="1" columnsXL="1"/>
+</mvc:View>

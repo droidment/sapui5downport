@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <edmx:Edmx Version="4.0" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
-	<edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/Common.xml">
-		<edmx:Include Namespace="com.sap.vocabularies.Common.v1" Alias="Common"/>
-	</edmx:Reference>
+	<!-- No edmx:Reference to the Common/UI vocabularies on purpose: the V4
+	     ODataMetaModel ships those standard com.sap.vocabularies.* terms built
+	     in, and the live Northwind service already references them, so a second
+	     declaration here is unnecessary. -->
 	<edmx:DataServices>
 		<Schema Namespace="downport.annotations" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+
+			<!-- ============ Value help (existing) ============ -->
 			<Annotations Target="NorthwindModel.Product/CategoryID">
 				<Annotation Term="com.sap.vocabularies.Common.v1.ValueList">
 					<Record Type="com.sap.vocabularies.Common.v1.ValueListType">
@@ -27,6 +30,167 @@
 					</Record>
 				</Annotation>
 			</Annotations>
+
+			<!-- ============ Property labels ============ -->
+			<Annotations Target="NorthwindModel.Product/ProductName">
+				<Annotation Term="com.sap.vocabularies.Common.v1.Label" String="Product Name"/>
+			</Annotations>
+			<Annotations Target="NorthwindModel.Product/QuantityPerUnit">
+				<Annotation Term="com.sap.vocabularies.Common.v1.Label" String="Quantity Per Unit"/>
+			</Annotations>
+			<Annotations Target="NorthwindModel.Product/UnitPrice">
+				<Annotation Term="com.sap.vocabularies.Common.v1.Label" String="Unit Price"/>
+			</Annotations>
+			<Annotations Target="NorthwindModel.Product/UnitsInStock">
+				<Annotation Term="com.sap.vocabularies.Common.v1.Label" String="Units In Stock"/>
+			</Annotations>
+			<Annotations Target="NorthwindModel.Product/UnitsOnOrder">
+				<Annotation Term="com.sap.vocabularies.Common.v1.Label" String="Units On Order"/>
+			</Annotations>
+			<Annotations Target="NorthwindModel.Product/ReorderLevel">
+				<Annotation Term="com.sap.vocabularies.Common.v1.Label" String="Reorder Level"/>
+			</Annotations>
+			<Annotations Target="NorthwindModel.Product/Discontinued">
+				<Annotation Term="com.sap.vocabularies.Common.v1.Label" String="Discontinued"/>
+			</Annotations>
+			<Annotations Target="NorthwindModel.Product/CategoryID">
+				<Annotation Term="com.sap.vocabularies.Common.v1.Label" String="Category"/>
+			</Annotations>
+			<Annotations Target="NorthwindModel.Product/SupplierID">
+				<Annotation Term="com.sap.vocabularies.Common.v1.Label" String="Supplier"/>
+			</Annotations>
+			<Annotations Target="NorthwindModel.Product/ProductID">
+				<Annotation Term="com.sap.vocabularies.Common.v1.Label" String="Product ID"/>
+			</Annotations>
+
+			<!-- ============ Object Page structure (Product entity type) ============ -->
+			<Annotations Target="NorthwindModel.Product">
+
+				<!-- Header: type names + which fields drive title/description -->
+				<Annotation Term="com.sap.vocabularies.UI.v1.HeaderInfo">
+					<Record Type="com.sap.vocabularies.UI.v1.HeaderInfoType">
+						<PropertyValue Property="TypeName" String="Product"/>
+						<PropertyValue Property="TypeNamePlural" String="Products"/>
+						<PropertyValue Property="Title">
+							<Record Type="com.sap.vocabularies.UI.v1.DataField">
+								<PropertyValue Property="Value" Path="ProductName"/>
+							</Record>
+						</PropertyValue>
+						<PropertyValue Property="Description">
+							<Record Type="com.sap.vocabularies.UI.v1.DataField">
+								<PropertyValue Property="Value" Path="QuantityPerUnit"/>
+							</Record>
+						</PropertyValue>
+					</Record>
+				</Annotation>
+
+				<!-- Field group: General Information -->
+				<Annotation Term="com.sap.vocabularies.UI.v1.FieldGroup" Qualifier="General">
+					<Record Type="com.sap.vocabularies.UI.v1.FieldGroupType">
+						<PropertyValue Property="Label" String="General Information"/>
+						<PropertyValue Property="Data">
+							<Collection>
+								<Record Type="com.sap.vocabularies.UI.v1.DataField">
+									<PropertyValue Property="Value" Path="ProductName"/>
+								</Record>
+								<Record Type="com.sap.vocabularies.UI.v1.DataField">
+									<PropertyValue Property="Value" Path="QuantityPerUnit"/>
+								</Record>
+								<Record Type="com.sap.vocabularies.UI.v1.DataField">
+									<PropertyValue Property="Value" Path="CategoryID"/>
+								</Record>
+								<Record Type="com.sap.vocabularies.UI.v1.DataField">
+									<PropertyValue Property="Value" Path="SupplierID"/>
+								</Record>
+							</Collection>
+						</PropertyValue>
+					</Record>
+				</Annotation>
+
+				<!-- Field group: Stock & Pricing -->
+				<Annotation Term="com.sap.vocabularies.UI.v1.FieldGroup" Qualifier="Stock">
+					<Record Type="com.sap.vocabularies.UI.v1.FieldGroupType">
+						<PropertyValue Property="Label" String="Stock &amp; Pricing"/>
+						<PropertyValue Property="Data">
+							<Collection>
+								<Record Type="com.sap.vocabularies.UI.v1.DataField">
+									<PropertyValue Property="Value" Path="UnitPrice"/>
+								</Record>
+								<Record Type="com.sap.vocabularies.UI.v1.DataField">
+									<PropertyValue Property="Value" Path="UnitsInStock"/>
+								</Record>
+								<Record Type="com.sap.vocabularies.UI.v1.DataField">
+									<PropertyValue Property="Value" Path="UnitsOnOrder"/>
+								</Record>
+								<Record Type="com.sap.vocabularies.UI.v1.DataField">
+									<PropertyValue Property="Value" Path="ReorderLevel"/>
+								</Record>
+								<Record Type="com.sap.vocabularies.UI.v1.DataField">
+									<PropertyValue Property="Value" Path="Discontinued"/>
+								</Record>
+							</Collection>
+						</PropertyValue>
+					</Record>
+				</Annotation>
+
+				<!-- Facets: which field groups become Object Page sections, in order -->
+				<Annotation Term="com.sap.vocabularies.UI.v1.Facets">
+					<Collection>
+						<Record Type="com.sap.vocabularies.UI.v1.ReferenceFacet">
+							<PropertyValue Property="Label" String="General Information"/>
+							<PropertyValue Property="Target" AnnotationPath="@com.sap.vocabularies.UI.v1.FieldGroup#General"/>
+						</Record>
+						<Record Type="com.sap.vocabularies.UI.v1.ReferenceFacet">
+							<PropertyValue Property="Label" String="Stock &amp; Pricing"/>
+							<PropertyValue Property="Target" AnnotationPath="@com.sap.vocabularies.UI.v1.FieldGroup#Stock"/>
+						</Record>
+						<!-- 1..many table facet: Target is a navigation path to the
+						     Order_Details collection's LineItem. The Object Page renders
+						     this as a table and (because the controller loads sections
+						     lazily) only requests the rows when the user opens it. -->
+						<Record Type="com.sap.vocabularies.UI.v1.ReferenceFacet">
+							<PropertyValue Property="Label" String="Order Details"/>
+							<PropertyValue Property="Target" AnnotationPath="Order_Details/@com.sap.vocabularies.UI.v1.LineItem"/>
+						</Record>
+					</Collection>
+				</Annotation>
+
+			</Annotations>
+
+			<!-- ============ Order_Detail (1..many child of Product) ============ -->
+			<Annotations Target="NorthwindModel.Order_Detail/OrderID">
+				<Annotation Term="com.sap.vocabularies.Common.v1.Label" String="Order ID"/>
+			</Annotations>
+			<Annotations Target="NorthwindModel.Order_Detail/UnitPrice">
+				<Annotation Term="com.sap.vocabularies.Common.v1.Label" String="Unit Price"/>
+			</Annotations>
+			<Annotations Target="NorthwindModel.Order_Detail/Quantity">
+				<Annotation Term="com.sap.vocabularies.Common.v1.Label" String="Quantity"/>
+			</Annotations>
+			<Annotations Target="NorthwindModel.Order_Detail/Discount">
+				<Annotation Term="com.sap.vocabularies.Common.v1.Label" String="Discount"/>
+			</Annotations>
+
+			<!-- Line item: the columns of the Order Details table, in order -->
+			<Annotations Target="NorthwindModel.Order_Detail">
+				<Annotation Term="com.sap.vocabularies.UI.v1.LineItem">
+					<Collection>
+						<Record Type="com.sap.vocabularies.UI.v1.DataField">
+							<PropertyValue Property="Value" Path="OrderID"/>
+						</Record>
+						<Record Type="com.sap.vocabularies.UI.v1.DataField">
+							<PropertyValue Property="Value" Path="UnitPrice"/>
+						</Record>
+						<Record Type="com.sap.vocabularies.UI.v1.DataField">
+							<PropertyValue Property="Value" Path="Quantity"/>
+						</Record>
+						<Record Type="com.sap.vocabularies.UI.v1.DataField">
+							<PropertyValue Property="Value" Path="Discount"/>
+						</Record>
+					</Collection>
+				</Annotation>
+			</Annotations>
+
 		</Schema>
 	</edmx:DataServices>
 </edmx:Edmx>

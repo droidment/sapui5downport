@@ -37,7 +37,7 @@
 		"flexEnabled": true,
 		"handleValidation": true,
 		"rootView": {
-			"viewName": "downport.view.Main",
+			"viewName": "downport.view.App",
 			"type": "XML",
 			"id": "app",
 			"async": true
@@ -50,7 +50,41 @@
 				"sap.ui.mdc": {},
 				"sap.ui.fl": {},
 				"sap.ui.layout": {},
-				"sap.ui.unified": {}
+				"sap.ui.unified": {},
+				"sap.uxap": {}
+			}
+		},
+		"routing": {
+			"config": {
+				"routerClass": "sap.m.routing.Router",
+				"type": "View",
+				"viewType": "XML",
+				"path": "downport.view",
+				"controlId": "app",
+				"controlAggregation": "pages",
+				"async": true
+			},
+			"routes": [
+				{
+					"name": "main",
+					"pattern": "",
+					"target": "main"
+				},
+				{
+					"name": "object",
+					"pattern": "Products/{productId}",
+					"target": "object"
+				}
+			],
+			"targets": {
+				"main": {
+					"id": "mainView",
+					"name": "Main"
+				},
+				"object": {
+					"id": "objectPageView",
+					"name": "ObjectPage"
+				}
 			}
 		},
 		"models": {

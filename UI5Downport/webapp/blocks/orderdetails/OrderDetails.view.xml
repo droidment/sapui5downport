@@ -1,0 +1,9 @@
+<mvc:View
+	controllerName="downport.blocks.orderdetails.OrderDetails"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m">
+	<!-- Empty shell. The controller builds the columns from the Order_Detail
+	     UI.v1.LineItem annotation and binds the rows to the Order_Details
+	     navigation collection. -->
+	<Table id="table" growing="true" growingThreshold="20"/>
+</mvc:View>

@@ -1,0 +1,10 @@
+<mvc:View
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	displayBlock="true"
+	height="100%">
+	<!-- Pure navigation container. The router (manifest sap.ui5/routing) places the
+	     Main and ObjectPage views into this App's "pages" aggregation (controlId:"app",
+	     controlAggregation:"pages"). -->
+	<App id="app"/>
+</mvc:View>

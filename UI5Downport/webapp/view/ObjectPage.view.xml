@@ -1,0 +1,26 @@
+<mvc:View
+	controllerName="downport.controller.ObjectPage"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:uxap="sap.uxap"
+	displayBlock="true"
+	height="100%">
+	<!-- The ObjectPageLayout is an empty shell: the header title/subtitle and every
+	     section + form field are built at runtime in the controller from the
+	     com.sap.vocabularies.UI.v1 annotations (HeaderInfo, Facets, FieldGroup) and
+	     Common.v1.Label, all read through the OData V4 ODataMetaModel. -->
+	<Page id="objectPage" showNavButton="true" navButtonPress=".onNavBack" class="sapUiNoContentPadding">
+		<content>
+			<!-- useIconTabBar: each section is a tab that is always visible (even before
+			     its content is built) and only the selected tab's content renders.
+			     Selecting a tab fires the layout's "navigate" event, which the
+			     controller uses to build that section's content + fire its OData call
+			     on demand (lazy loading). -->
+			<uxap:ObjectPageLayout id="objectPageLayout" showTitleInHeaderContent="false" useIconTabBar="true">
+				<uxap:headerTitle>
+					<uxap:ObjectPageHeader id="opHeader" objectTitle="" objectSubtitle=""/>
+				</uxap:headerTitle>
+			</uxap:ObjectPageLayout>
+		</content>
+	</Page>
+</mvc:View>

@@ -10,9 +10,8 @@
 	xmlns:vhfb="sap.ui.mdc.filterbar.vh"
 	displayBlock="true"
 	height="100%">
-	<App id="app">
-		<Page id="page" title="MDC FilterBar + Table + ValueHelps on OpenUI5 1.120.30 (OData V4 / Northwind)" class="sapUiContentPadding">
-			<content>
+	<Page id="page" title="MDC FilterBar + Table + ValueHelps on OpenUI5 1.120.30 (OData V4 / Northwind)" class="sapUiContentPadding">
+		<content>
 				<!-- ===================== FILTER BAR ===================== -->
 				<mdc:FilterBar id="filterBar"
 					p13nMode="Value"
@@ -180,6 +179,7 @@
 					p13nMode="Column,Sort"
 					threshold="50"
 					filter="filterBar"
+					rowPress=".onProductPress"
 					class="sapUiSmallMarginTop"
 					delegate="{name: 'downport/delegate/TableDelegate', payload: {collectionPath: '/Products'}}">
 					<mdc:type>
@@ -211,5 +211,4 @@
 				</mdc:Table>
 			</content>
 		</Page>
-	</App>
 </mvc:View>
