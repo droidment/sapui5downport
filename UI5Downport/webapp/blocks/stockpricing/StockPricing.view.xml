@@ -4,5 +4,10 @@
 	xmlns:f="sap.ui.layout.form"
 	xmlns="sap.m">
 	<!-- Empty shell, filled by the controller from FieldGroup#Stock. -->
+	<!-- Action bar: one button per UI.DataFieldForAction in FieldGroup#Stock,
+	     appended + shown by the controller; each runs via util/AsyncActionRunner. -->
+	<OverflowToolbar id="actions" visible="false">
+		<ToolbarSpacer/>
+	</OverflowToolbar>
 	<f:SimpleForm id="form" layout="ColumnLayout" editable="false" columnsM="1" columnsL="1" columnsXL="1"/>
 </mvc:View>

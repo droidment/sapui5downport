@@ -1,8 +1,9 @@
 sap.ui.define([
 	"sap/ui/core/mvc/Controller",
 	"sap/m/Label",
-	"sap/m/Text"
-], function (Controller, Label, Text) {
+	"sap/m/Text",
+	"downport/util/BlockActions"
+], function (Controller, Label, Text, BlockActions) {
 	"use strict";
 
 	// This section's annotation source. Everything (which fields, their labels) is
@@ -32,7 +33,10 @@ sap.ui.define([
 
 			var oMeta = this.getView().getModel().getMetaModel();
 			var oForm = this.byId("form");
-			var aData = (((oMeta.getObject(FIELD_GROUP) || {}).Data) || []).filter(function (oData) {
+			// Full FieldGroup collection: DataField records become fields below,
+			// DataFieldForAction records become buttons (see _buildActions).
+			var aAll = ((oMeta.getObject(FIELD_GROUP) || {}).Data) || [];
+			var aData = aAll.filter(function (oData) {
 				return oData.$Type === "com.sap.vocabularies.UI.v1.DataField" && oData.Value && oData.Value.$Path;
 			});
 
@@ -54,6 +58,21 @@ sap.ui.define([
 				oForm.addContent(new Label({ text: sLabel }));
 				oForm.addContent(new Text({ text: "{" + sPath + "}" }));
 			});
+
+			this._buildActions(aAll, oContext);
+		},
+
+		// Annotation-driven custom actions: one button per UI.DataFieldForAction
+		// in this FieldGroup. Each routes through util/AsyncActionRunner (trigger
+		// + poll), NOT a standard OData action POST.
+		_buildActions: function (aAll, oContext) {
+			var aButtons = BlockActions.buildButtons(aAll, { context: oContext });
+			if (!aButtons.length) {
+				return;
+			}
+			var oToolbar = this.byId("actions");
+			aButtons.forEach(function (oButton) { oToolbar.addContent(oButton); });
+			oToolbar.setVisible(true);
 		}
 	});
 });

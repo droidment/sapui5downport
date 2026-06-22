@@ -2,8 +2,9 @@ sap.ui.define([
 	"sap/ui/core/mvc/Controller",
 	"sap/m/Column",
 	"sap/m/Text",
-	"sap/m/ColumnListItem"
-], function (Controller, Column, Text, ColumnListItem) {
+	"sap/m/ColumnListItem",
+	"downport/util/BlockActions"
+], function (Controller, Column, Text, ColumnListItem, BlockActions) {
 	"use strict";
 
 	var ENTITY = "/Products";
@@ -54,6 +55,34 @@ sap.ui.define([
 				templateShareable: false,
 				parameters: { $$ownRequest: true }
 			});
+
+			this._buildActions(aLineItem, oContext, oTable);
+		},
+
+		// Table-level custom actions: one header-toolbar button per
+		// UI.DataFieldForAction in the LineItem, each routed through
+		// util/AsyncActionRunner. On success, refresh the rows so a newly
+		// created order shows up.
+		_buildActions: function (aLineItem, oContext, oTable) {
+			var aButtons = BlockActions.buildButtons(aLineItem, {
+				context: oContext,
+				onSuccess: function () {
+					// Refresh the rows so a newly created order shows up. This
+					// relative list binding (even with $$ownRequest) is not a "root"
+					// binding, so refresh() must go through its root binding; the
+					// Order_Details request re-fires as a dependent of that root.
+					var oBinding = oTable.getBinding("items");
+					if (oBinding) {
+						(oBinding.getRootBinding() || oBinding).refresh();
+					}
+				}
+			});
+			if (!aButtons.length) {
+				return;
+			}
+			var oToolbar = this.byId("actions");
+			aButtons.forEach(function (oButton) { oToolbar.addContent(oButton); });
+			oToolbar.setVisible(true);
 		}
 	});
 });

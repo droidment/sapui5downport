@@ -6,5 +6,11 @@
 	<!-- Empty shell. The controller fills this SimpleForm from the
 	     com.sap.vocabularies.UI.v1.FieldGroup#General annotation (Label + value per
 	     DataField), reading labels from Common.v1.Label via the OData metamodel. -->
+	<!-- Action bar: the controller appends a button per UI.DataFieldForAction in
+	     the same FieldGroup, and flips this visible. Each button runs through
+	     util/AsyncActionRunner. -->
+	<OverflowToolbar id="actions" visible="false">
+		<ToolbarSpacer/>
+	</OverflowToolbar>
 	<f:SimpleForm id="form" layout="ColumnLayout" editable="false" columnsM="1" columnsL="1" columnsXL="1"/>
 </mvc:View>
