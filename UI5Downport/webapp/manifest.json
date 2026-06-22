@@ -3,7 +3,7 @@
 	"sap.app": {
 		"id": "downport",
 		"type": "application",
-		"title": "MDC ValueHelp + FilterBar on OpenUI5 1.120 (OData V4)",
+		"title": "Annotation-Driven SAPUI5 Application",
 		"applicationVersion": {
 			"version": "1.0.0"
 		},
@@ -51,7 +51,8 @@
 				"sap.ui.fl": {},
 				"sap.ui.layout": {},
 				"sap.ui.unified": {},
-				"sap.uxap": {}
+				"sap.uxap": {},
+				"downport.annotation": {}
 			}
 		},
 		"routing": {
@@ -100,6 +101,7 @@
 			"": {
 				"dataSource": "northwind",
 				"settings": {
+					"synchronizationMode": "None",
 					"operationMode": "Server",
 					"groupId": "$direct"
 				}

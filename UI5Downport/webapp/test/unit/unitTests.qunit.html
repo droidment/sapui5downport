@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Annotation Runtime Unit Tests</title>
+	<link rel="stylesheet" href="https://ui5.sap.com/1.120.30/resources/sap/ui/thirdparty/qunit-2.css">
+	<script src="https://ui5.sap.com/1.120.30/resources/sap/ui/thirdparty/qunit-2.js"></script>
+	<script>QUnit.config.autostart = false;</script>
+	<script
+		id="sap-ui-bootstrap"
+		src="https://ui5.sap.com/1.120.30/resources/sap-ui-core.js"
+		data-sap-ui-async="true"
+		data-sap-ui-resource-roots='{"downport":"../../"}'
+		data-sap-ui-on-init="module:downport/test/unit/AnnotationResolver.qunit">
+	</script>
+</head>
+<body>
+	<div id="qunit"></div>
+	<div id="qunit-fixture"></div>
+</body>
+</html>
