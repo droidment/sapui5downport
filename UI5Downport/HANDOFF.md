@@ -17,7 +17,10 @@ annotation-driven Object Page — to **OpenUI5 1.120.30**, running against a
 Two pages:
 1. **Main** — an MDC `FilterBar` + MDC `Table` over `Products`, with per-field
    `ValueHelp` (Category value help is annotation-driven via `Common.ValueList`).
-   Row press navigates to the Object Page.
+   Row press navigates to the Object Page. The table is **multi-select** with two
+   toolbar actions (**Active Work** / **Passive Work**) that fan out to the async
+   runner — one job per selected row — and there is a custom **"In WIP"** switch
+   filter that the `TableDelegate` ANDs into the `$filter` query on search (see §7).
 2. **Object Page** (`sap.uxap`) — annotation-driven: header from `UI.HeaderInfo`,
    one section per `UI.Facets` ReferenceFacet, each section's content built from
    `UI.FieldGroup` / `UI.LineItem`. Sections are **lazy** (data fetched only when
@@ -95,9 +98,11 @@ to `python`. If you use a Preview MCP, it can reuse/own the server on 8181.
 - Note: commits so far were authored as `rajbala@rajs-mac-mini.lan` because no
   `user.name`/`user.email` is configured. Not a blocker; set yours if you like.
 
-### Commit history (most recent last-ish)
+### Commit history (most recent first)
 ```
-f6200a7 Add annotation-driven custom block actions via async runner seam   <-- latest
+<this commit> Add Main-page custom WIP filter, multi-select + Active/Passive Work actions  <-- latest
+07e69ca Add session handoff doc for Windows pickup
+f6200a7 Add annotation-driven custom block actions via async runner seam
 b3ee988 Refactor Object Page sections into lazy-loading uxap BlockBase blocks
 450c33a Add MDC FilterBar + Table + ValueHelp downport on OpenUI5 1.120.30 (OData V4 Northwind)
 ```
@@ -124,14 +129,22 @@ UI5Downport/
                                   DataFieldForAction). Edit here to change the UI.
     view/
       App.view.xml                Root: <App id="app"/> (routing target container)
-      Main.view.xml               MDC FilterBar + MDC Table + ValueHelps
+      Main.view.xml               MDC FilterBar + "In WIP" Switch (Toolbar) + multi-select
+                                  MDC Table with mdc:actions (Active/Passive Work buttons)
       ObjectPage.view.xml         Page > ObjectPageLayout (useIconTabBar) > ObjectPageHeader
     controller/
-      Main.controller.js          FilterBar/Table wiring; onProductPress -> navTo("object")
+      Main.controller.js          FilterBar/Table wiring; onProductPress -> navTo("object").
+                                  Holds "In WIP" state in an unnamed-view "ui" JSON model
+                                  (/inWIP). onWIPChange re-triggers FilterBar search.
+                                  onActiveWork/onPassiveWork -> _runForSelected: one
+                                  AsyncActionRunner.run() per getSelectedContexts() row,
+                                  Promise.all -> summary toast, then clearSelection().
       ObjectPage.controller.js    Reads HeaderInfo + Facets; builds header; creates one
                                   ObjectPageSection per ReferenceFacet, each hosting a Block
     delegate/                     Custom MDC delegates (the "no fe.macros" route)
-      TableDelegate.js            MDC Table over OData V4 Products
+      TableDelegate.js            MDC Table over OData V4 Products. updateBindingInfo reads
+                                  ui>/inWIP and (when on) pushes WIP_FILTER (UnitsOnOrder gt 0)
+                                  into oBindingInfo.filters AFTER super, AND-joining the $filter
       FilterBarMainDelegate.js    Main FilterBar fetchProperties
       FilterBarDelegate.js        Value-help inner FilterBar delegate
       ValueHelpDelegate.js        ValueHelp content
@@ -215,6 +228,34 @@ Both methods currently contain a stub (fake `jobId`, ~3 "running" polls then
 label, context, payload, onProgress, options })` resolves with the action result
 or rejects with an `Error`.
 
+### The Main page ALSO routes through the same runner
+The Products MDC Table is multi-select (`selectionMode="Multi"`) with two
+`mdc:actions` buttons — **Active Work** (`downport.action.ActiveWork`) and
+**Passive Work** (`downport.action.PassiveWork`). On press,
+`Main.controller.js` `_runForSelected` reads `oTable.getSelectedContexts()` and
+fires **one `AsyncActionRunner.run()` per selected row** (payload carries that
+row's `productId` + context path), disables both buttons, then `Promise.all`s
+the jobs and shows a summary toast (`"… done: N succeeded, M failed"`) before
+re-enabling and clearing the selection. So when you swap in the real runner
+(§7 above), these buttons light up too — no extra wiring. Verified live: 2
+selected rows → 2 runner jobs → `"Passive Work done: 2 succeeded"`.
+
+### The custom "In WIP" switch filter (NOT an MDC FilterField)
+MDC `FilterBar` only hosts `FilterField`s, so "In WIP" is a plain `sap.m.Switch`
+in a `Toolbar` below the FilterBar, bound to `ui>/inWIP`. The mechanism:
+1. `onWIPChange` calls `oFilterBar.triggerSearch()` so the table rebinds.
+2. `TableDelegate.updateBindingInfo` runs the **stock** V4 delegate first (that
+   turns the FilterBar conditions into `oBindingInfo.filters`), then reads
+   `oTable.getModel("ui").getProperty("/inWIP")` and, when true, pushes
+   `WIP_FILTER` onto `oBindingInfo.filters` — AND-joining it into `$filter`.
+3. `WIP_FILTER = new Filter("UnitsOnOrder", FilterOperator.GT, 0)`. **To repoint
+   the switch at a different field, change that one line** in `TableDelegate.js`.
+   (`UnitsOnOrder` is a real Northwind Product property; it is intentionally NOT
+   declared in `fetchProperties`/`FilterBarMainDelegate` — a raw model `Filter`
+   filters on it fine without being a surfaced MDC column.)
+Verified live: toggling on issues `GET /Products?$count=true&$filter=UnitsOnOrder gt 0…`
+and the row count drops (77 → 17).
+
 ### Things the user may also want (ASK, don't assume)
 - **Real action ids:** the `Action` strings in `annotations.xml` are placeholders
   the runner maps. Rename to match the real backend action keys.
@@ -259,6 +300,10 @@ Record discriminators (the `$Type` you filter on):
 - The async flow was verified end-to-end with the simulated runner: button
   busy → progress phases `triggering → polling:1..3 → succeeded` → success toast →
   Order Details table refresh fired a new `Order_Details` GET, no errors.
+- Main-page features verified live: the "In WIP" switch ANDs `UnitsOnOrder gt 0`
+  into the `$filter` (row count 77 → 17); inner table is `MultiSelect`;
+  selecting 2 rows + Passive Work fired 2 runner jobs (one per row) and toasted
+  `"Passive Work done: 2 succeeded"`, then cleared the selection.
 
 ---
 

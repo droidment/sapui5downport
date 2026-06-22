@@ -5,6 +5,7 @@
 	xmlns:mdc="sap.ui.mdc"
 	xmlns:mdcField="sap.ui.mdc.field"
 	xmlns:mdcTable="sap.ui.mdc.table"
+	xmlns:mdcat="sap.ui.mdc.actiontoolbar"
 	xmlns:mdcvh="sap.ui.mdc.valuehelp"
 	xmlns:mdcvc="sap.ui.mdc.valuehelp.content"
 	xmlns:vhfb="sap.ui.mdc.filterbar.vh"
@@ -171,12 +172,26 @@
 					</mdc:filterItems>
 				</mdc:FilterBar>
 
+				<!-- ===================== CUSTOM FILTER ROW =====================
+				     "In WIP" is NOT an MDC FilterField (MDC FilterBar only hosts
+				     FilterFields). It is a plain Switch whose state lives in the
+				     unnamed-view "ui" JSON model. On search the TableDelegate reads
+				     ui>/inWIP and appends a custom condition to the $filter query.
+				     Toggling re-triggers the FilterBar search so it applies at once. -->
+				<Toolbar id="customFilters" class="sapUiSmallMarginTop">
+					<Label text="In WIP" labelFor="swInWIP"/>
+					<Switch id="swInWIP" state="{ui>/inWIP}" change=".onWIPChange"
+						customTextOn="WIP" customTextOff="All"/>
+					<ToolbarSpacer/>
+				</Toolbar>
+
 				<!-- ===================== RESULTS TABLE ===================== -->
 				<mdc:Table id="productsTable"
 					header="Products"
 					showRowCount="true"
 					autoBindOnInit="true"
 					p13nMode="Column,Sort"
+					selectionMode="Multi"
 					threshold="50"
 					filter="filterBar"
 					rowPress=".onProductPress"
@@ -185,6 +200,17 @@
 					<mdc:type>
 						<mdcTable:ResponsiveTableType growingMode="Scroll"/>
 					</mdc:type>
+					<!-- Toolbar actions. Both operate on the multi-selected rows and run
+					     the async runner once per selected item (Passive Work as the
+					     spec'd example; Active Work mirrors it with a different action id). -->
+					<mdc:actions>
+						<mdcat:ActionToolbarAction>
+							<Button id="btnActiveWork" text="Active Work" press=".onActiveWork"/>
+						</mdcat:ActionToolbarAction>
+						<mdcat:ActionToolbarAction>
+							<Button id="btnPassiveWork" text="Passive Work" type="Emphasized" press=".onPassiveWork"/>
+						</mdcat:ActionToolbarAction>
+					</mdc:actions>
 					<mdc:columns>
 						<mdcTable:Column header="ID" propertyKey="ProductID" width="5rem">
 							<Text text="{ProductID}"/>
