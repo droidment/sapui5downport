@@ -1,0 +1,44 @@
+{
+	"hosting": {
+		"site": "sapui5-fc643",
+		"public": "webapp",
+		"ignore": [
+			"firebase.json",
+			"**/.*",
+			"**/node_modules/**"
+		],
+		"rewrites": [
+			{
+				"source": "/odata/**",
+				"function": {
+					"functionId": "odataProxy",
+					"region": "us-central1"
+				}
+			},
+			{
+				"source": "**",
+				"destination": "/index.html"
+			}
+		],
+		"headers": [
+			{
+				"source": "**/*.@(json|xml)",
+				"headers": [
+					{
+						"key": "Cache-Control",
+						"value": "no-cache"
+					}
+				]
+			}
+		]
+	},
+	"functions": {
+		"source": "functions",
+		"codebase": "default",
+		"ignore": [
+			"node_modules",
+			".git",
+			"*.log"
+		]
+	}
+}

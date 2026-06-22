@@ -1,0 +1,12 @@
+{
+	"name": "functions",
+	"description": "OData V4 reverse proxy for the UI5 1.120 downport app (prod port of server.py)",
+	"private": true,
+	"main": "index.js",
+	"engines": {
+		"node": "20"
+	},
+	"dependencies": {
+		"firebase-functions": "^5.1.1"
+	}
+}
