@@ -1,0 +1,66 @@
+{
+	"_version": "1.40.0",
+	"sap.app": {
+		"id": "downport",
+		"type": "application",
+		"title": "MDC ValueHelp + FilterBar on OpenUI5 1.120 (OData V4)",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"dataSources": {
+			"northwind": {
+				"uri": "/odata/V4/Northwind/Northwind.svc/",
+				"type": "OData",
+				"settings": {
+					"odataVersion": "4.0",
+					"annotations": ["localAnnotations"]
+				}
+			},
+			"localAnnotations": {
+				"type": "ODataAnnotation",
+				"uri": "localService/annotations.xml",
+				"settings": {
+					"localUri": "localService/annotations.xml"
+				}
+			}
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		}
+	},
+	"sap.ui5": {
+		"flexEnabled": true,
+		"handleValidation": true,
+		"rootView": {
+			"viewName": "downport.view.Main",
+			"type": "XML",
+			"id": "app",
+			"async": true
+		},
+		"dependencies": {
+			"minUI5Version": "1.120.0",
+			"libs": {
+				"sap.ui.core": {},
+				"sap.m": {},
+				"sap.ui.mdc": {},
+				"sap.ui.fl": {},
+				"sap.ui.layout": {},
+				"sap.ui.unified": {}
+			}
+		},
+		"models": {
+			"": {
+				"dataSource": "northwind",
+				"settings": {
+					"operationMode": "Server",
+					"groupId": "$direct"
+				}
+			}
+		}
+	}
+}
