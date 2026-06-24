@@ -5,21 +5,42 @@
 	xmlns:uxap="sap.uxap"
 	displayBlock="true"
 	height="100%">
-	<!-- The ObjectPageLayout is an empty shell: the header title/subtitle and every
-	     section + form field are built at runtime in the controller from the
-	     com.sap.vocabularies.UI.v1 annotations (HeaderInfo, Facets, FieldGroup) and
-	     Common.v1.Label, all read through the OData V4 ODataMetaModel. -->
 	<Page id="objectPage" showNavButton="true" navButtonPress=".onNavBack" class="sapUiNoContentPadding">
 		<content>
-			<!-- useIconTabBar: each section is a tab that is always visible (even before
-			     its content is built) and only the selected tab's content renders.
-			     Selecting a tab fires the layout's "navigate" event, which the
-			     controller uses to build that section's content + fire its OData call
-			     on demand (lazy loading). -->
-			<uxap:ObjectPageLayout id="objectPageLayout" showTitleInHeaderContent="false" useIconTabBar="true">
+			<!-- Traditional UXAP shell: HeaderInfo drives title/subtitle; Facets become
+			     ObjectPageSections with BlockBase content under the anchor bar. -->
+			<uxap:ObjectPageLayout
+				id="objectPageLayout"
+				showTitleInHeaderContent="false"
+				showHeaderContent="true"
+				showAnchorBar="true"
+				useIconTabBar="false"
+				alwaysShowContentHeader="true">
 				<uxap:headerTitle>
 					<uxap:ObjectPageHeader id="opHeader" objectTitle="" objectSubtitle=""/>
 				</uxap:headerTitle>
+				<uxap:headerContent>
+					<VBox class="sapUiSmallMarginEnd">
+						<Label text="Product ID"/>
+						<Text text="{ProductID}"/>
+					</VBox>
+					<VBox class="sapUiSmallMarginEnd">
+						<Label text="Unit Price"/>
+						<ObjectNumber number="{UnitPrice}" unit="USD"/>
+					</VBox>
+					<VBox class="sapUiSmallMarginEnd">
+						<Label text="Units In Stock"/>
+						<Text text="{UnitsInStock}"/>
+					</VBox>
+					<VBox class="sapUiSmallMarginEnd">
+						<Label text="Units On Order"/>
+						<Text text="{UnitsOnOrder}"/>
+					</VBox>
+					<ObjectStatus
+						title="Discontinued"
+						text="{path:'Discontinued', formatter:'.formatDiscontinuedText'}"
+						state="{path:'Discontinued', formatter:'.formatDiscontinuedState'}"/>
+				</uxap:headerContent>
 			</uxap:ObjectPageLayout>
 		</content>
 	</Page>

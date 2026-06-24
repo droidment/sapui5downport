@@ -31,6 +31,33 @@
 				</Annotation>
 			</Annotations>
 
+			<!-- Supplier value help (annotation-driven, mirrors CategoryID above) -->
+			<Annotations Target="NorthwindModel.Product/SupplierID">
+				<Annotation Term="com.sap.vocabularies.Common.v1.ValueList">
+					<Record Type="com.sap.vocabularies.Common.v1.ValueListType">
+						<PropertyValue Property="Label" String="Supplier"/>
+						<PropertyValue Property="CollectionPath" String="Suppliers"/>
+						<PropertyValue Property="Parameters">
+							<Collection>
+								<Record Type="com.sap.vocabularies.Common.v1.ValueListParameterInOut">
+									<PropertyValue Property="LocalDataProperty" PropertyPath="SupplierID"/>
+									<PropertyValue Property="ValueListProperty" String="SupplierID"/>
+								</Record>
+								<Record Type="com.sap.vocabularies.Common.v1.ValueListParameterDisplayOnly">
+									<PropertyValue Property="ValueListProperty" String="CompanyName"/>
+								</Record>
+								<Record Type="com.sap.vocabularies.Common.v1.ValueListParameterDisplayOnly">
+									<PropertyValue Property="ValueListProperty" String="City"/>
+								</Record>
+								<Record Type="com.sap.vocabularies.Common.v1.ValueListParameterDisplayOnly">
+									<PropertyValue Property="ValueListProperty" String="Country"/>
+								</Record>
+							</Collection>
+						</PropertyValue>
+					</Record>
+				</Annotation>
+			</Annotations>
+
 			<!-- ============ Property labels ============ -->
 			<Annotations Target="NorthwindModel.Product/ProductName">
 				<Annotation Term="com.sap.vocabularies.Common.v1.Label" String="Product Name"/>
@@ -144,6 +171,53 @@
 							</Collection>
 						</PropertyValue>
 					</Record>
+				</Annotation>
+
+				<!-- Results list (Main page): SelectionFields drive the FilterBar fields,
+				     LineItem drives the table columns + toolbar actions. Read at runtime by
+				     Main.controller via util/MetadataDriven — the freestyle analogue of the
+				     sap.fe.macros FilterBar/Table building blocks. -->
+				<Annotation Term="com.sap.vocabularies.UI.v1.SelectionFields">
+					<Collection>
+						<PropertyPath>ProductName</PropertyPath>
+						<PropertyPath>CategoryID</PropertyPath>
+						<PropertyPath>SupplierID</PropertyPath>
+					</Collection>
+				</Annotation>
+				<Annotation Term="com.sap.vocabularies.UI.v1.LineItem">
+					<Collection>
+						<Record Type="com.sap.vocabularies.UI.v1.DataField">
+							<PropertyValue Property="Value" Path="ProductID"/>
+						</Record>
+						<Record Type="com.sap.vocabularies.UI.v1.DataField">
+							<PropertyValue Property="Value" Path="ProductName"/>
+						</Record>
+						<Record Type="com.sap.vocabularies.UI.v1.DataField">
+							<PropertyValue Property="Value" Path="QuantityPerUnit"/>
+						</Record>
+						<Record Type="com.sap.vocabularies.UI.v1.DataField">
+							<PropertyValue Property="Value" Path="CategoryID"/>
+						</Record>
+						<Record Type="com.sap.vocabularies.UI.v1.DataField">
+							<PropertyValue Property="Value" Path="SupplierID"/>
+						</Record>
+						<Record Type="com.sap.vocabularies.UI.v1.DataField">
+							<PropertyValue Property="Value" Path="UnitPrice"/>
+						</Record>
+						<Record Type="com.sap.vocabularies.UI.v1.DataField">
+							<PropertyValue Property="Value" Path="UnitsInStock"/>
+						</Record>
+						<!-- Table-level actions over the multi-selected rows; the controller
+						     fans each out through util/AsyncActionRunner (one job per row). -->
+						<Record Type="com.sap.vocabularies.UI.v1.DataFieldForAction">
+							<PropertyValue Property="Label" String="Active Work"/>
+							<PropertyValue Property="Action" String="downport.action.ActiveWork"/>
+						</Record>
+						<Record Type="com.sap.vocabularies.UI.v1.DataFieldForAction">
+							<PropertyValue Property="Label" String="Passive Work"/>
+							<PropertyValue Property="Action" String="downport.action.PassiveWork"/>
+						</Record>
+					</Collection>
 				</Annotation>
 
 				<!-- Facets: which field groups become Object Page sections, in order -->

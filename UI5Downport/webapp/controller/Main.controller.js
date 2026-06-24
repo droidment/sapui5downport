@@ -2,18 +2,65 @@ sap.ui.define([
 	"sap/ui/core/mvc/Controller",
 	"sap/ui/model/json/JSONModel",
 	"sap/m/MessageToast",
-	"downport/util/AsyncActionRunner"
-], function (Controller, JSONModel, MessageToast, AsyncActionRunner) {
+	"sap/base/Log",
+	"downport/util/AsyncActionRunner",
+	"downport/util/MetadataDriven"
+], function (Controller, JSONModel, MessageToast, Log, AsyncActionRunner, MetadataDriven) {
 	"use strict";
 
+	var ENTITY = "/Products";
+
 	// The MDC FilterBar owns the standard filter conditions and the MDC Table binds
-	// straight to the live OData V4 Northwind model. The only extra state we keep is
-	// the custom "In WIP" switch, held in a small unnamed-view "ui" JSON model so the
-	// TableDelegate can read it when it assembles the $filter query.
+	// straight to the live OData V4 Northwind model. The page is assembled from
+	// annotations the fe.macros way: UI.SelectionFields -> FilterBar fields,
+	// UI.LineItem -> table columns + toolbar actions (see util/MetadataDriven). The
+	// only extra state we keep is the custom "In WIP" switch, held in a small
+	// unnamed-view "ui" JSON model so the TableDelegate can read it on search.
 	return Controller.extend("downport.controller.Main", {
 
 		onInit: function () {
 			this.getView().setModel(new JSONModel({ inWIP: false }), "ui");
+			this._mActionButtons = {};
+			// Build on route match, not onInit: at onInit the OData model has not yet
+			// propagated to the view, so getModel().getMetaModel() would be undefined.
+			// By patternMatched the model is available (same timing the Object Page relies
+			// on). Guard so the annotation-driven columns/fields are built only once.
+			this.getOwnerComponent().getRouter().getRoute("main")
+				.attachPatternMatched(this._onMainMatched, this);
+		},
+
+		_onMainMatched: function () {
+			if (!this._pBuilt) {
+				this._pBuilt = this._buildFromAnnotations();
+			}
+		},
+
+		// fe.macros-style assembly: read UI.LineItem / UI.SelectionFields and build the
+		// table columns (+ toolbar actions) and the FilterBar fields at runtime, then
+		// issue the first bind once the columns (and therefore $select) exist.
+		_buildFromAnnotations: function () {
+			var that = this;
+			var oTable = this.byId("productsTable");
+			var oFilterBar = this.byId("filterBar");
+
+			// DataFieldForAction Action ids -> handlers. Active Work navigates to the
+			// filtered Low Stock view once every selected row's job is done.
+			var mPress = {
+				"downport.action.ActiveWork": function () { that.onActiveWork(); },
+				"downport.action.PassiveWork": function () { that.onPassiveWork(); }
+			};
+
+			Promise.all([
+				MetadataDriven.buildColumns(oTable, ENTITY, mPress),
+				MetadataDriven.buildFilterFields(oFilterBar, ENTITY)
+			]).then(function (aResult) {
+				that._mActionButtons = aResult[0] || {};
+				return oTable.initialized();
+			}).then(function () {
+				oTable.rebind();
+			}).catch(function (oError) {
+				Log.error("Failed to build the Main page from annotations", oError);
+			});
 		},
 
 		// Row tap on the MDC Table -> navigate to the annotation-driven Object Page.
@@ -100,11 +147,12 @@ sap.ui.define([
 			});
 		},
 
+		// Enable/disable the annotation-generated toolbar actions (keyed by Action id).
 		_setActionsEnabled: function (bEnabled) {
-			var oActive = this.byId("btnActiveWork");
-			var oPassive = this.byId("btnPassiveWork");
-			if (oActive) { oActive.setEnabled(bEnabled); }
-			if (oPassive) { oPassive.setEnabled(bEnabled); }
+			var mButtons = this._mActionButtons || {};
+			Object.keys(mButtons).forEach(function (sId) {
+				if (mButtons[sId]) { mButtons[sId].setEnabled(bEnabled); }
+			});
 		}
 	});
 });

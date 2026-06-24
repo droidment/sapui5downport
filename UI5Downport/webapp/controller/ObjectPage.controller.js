@@ -22,6 +22,13 @@ sap.ui.define([
 	// a Fiori Elements Object Page block with lazy loading.
 	var ENTITY = "/Products";
 	var UI = "@com.sap.vocabularies.UI.v1.";
+	var HEADER_CONTENT_FIELDS = [
+		"ProductID",
+		"UnitPrice",
+		"UnitsInStock",
+		"UnitsOnOrder",
+		"Discontinued"
+	];
 
 	return Controller.extend("downport.controller.ObjectPage", {
 
@@ -83,6 +90,7 @@ sap.ui.define([
 			if (oHeaderInfo.TypeName) {
 				this.byId("objectPage").setTitle(oHeaderInfo.TypeName);
 			}
+			HEADER_CONTENT_FIELDS.forEach(this._addHeaderField, this);
 		},
 
 		_addHeaderField: function (sPath) {
@@ -110,7 +118,12 @@ sap.ui.define([
 				}
 				that._oLayout.addSection(new ObjectPageSection({
 					title: oFacet.Label || "",
-					subSections: [ new ObjectPageSubSection({ blocks: [ oBlock ] }) ]
+					subSections: [
+						new ObjectPageSubSection({
+							title: oFacet.Label || "",
+							blocks: [ oBlock ]
+						})
+					]
 				}));
 			});
 		},
@@ -136,6 +149,14 @@ sap.ui.define([
 				path: "/Products(" + this._sProductId + ")",
 				parameters: { $select: this._aHeaderFields.join(",") }
 			});
+		},
+
+		formatDiscontinuedText: function (bDiscontinued) {
+			return bDiscontinued === true ? "Yes" : "No";
+		},
+
+		formatDiscontinuedState: function (bDiscontinued) {
+			return bDiscontinued === true ? "Error" : "None";
 		},
 
 		onNavBack: function () {

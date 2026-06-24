@@ -1,8 +1,9 @@
 sap.ui.define([
 	"sap/ui/mdc/odata/v4/TableDelegate",
 	"sap/ui/model/Filter",
-	"sap/ui/model/FilterOperator"
-], function (ODataV4TableDelegate, Filter, FilterOperator) {
+	"sap/ui/model/FilterOperator",
+	"downport/util/MetadataDriven"
+], function (ODataV4TableDelegate, Filter, FilterOperator, MetadataDriven) {
 	"use strict";
 
 	// "In WIP" maps to products with units currently on order (work in progress).
@@ -12,21 +13,16 @@ sap.ui.define([
 	// Delegate for the sap.ui.mdc.Table that lists Northwind V4 Products.
 	// Extends the stock OData V4 TableDelegate so it inherits the V4 binding
 	// mechanics (filter/sort translation from the linked FilterBar's conditions,
-	// $count, $select from visible columns). We only override fetchProperties to
-	// declare the Product entity properties explicitly (instead of deriving them
-	// from $metadata) and pin the collection path.
+	// $count, $select from visible columns). fetchProperties is derived from
+	// $metadata + Common.Label annotations (see util/MetadataDriven) instead of a
+	// hard-coded list — so every Product property is available and the UI.LineItem
+	// annotation alone decides which become columns.
 	var Delegate = Object.assign({}, ODataV4TableDelegate);
 
-	Delegate.fetchProperties = function () {
-		return Promise.resolve([
-			{ name: "ProductID", path: "ProductID", label: "ID", dataType: "sap.ui.model.odata.type.Int32", key: true, sortable: true, filterable: true },
-			{ name: "ProductName", path: "ProductName", label: "Product Name", dataType: "sap.ui.model.odata.type.String", sortable: true, filterable: true },
-			{ name: "QuantityPerUnit", path: "QuantityPerUnit", label: "Qty per Unit", dataType: "sap.ui.model.odata.type.String", sortable: true, filterable: true },
-			{ name: "UnitPrice", path: "UnitPrice", label: "Unit Price", dataType: "sap.ui.model.odata.type.Decimal", sortable: true, filterable: true },
-			{ name: "UnitsInStock", path: "UnitsInStock", label: "Units In Stock", dataType: "sap.ui.model.odata.type.Int16", sortable: true, filterable: true },
-			{ name: "CategoryID", path: "CategoryID", label: "Category", dataType: "sap.ui.model.odata.type.Int32", sortable: true, filterable: true },
-			{ name: "SupplierID", path: "SupplierID", label: "Supplier", dataType: "sap.ui.model.odata.type.Int32", sortable: true, filterable: true }
-		]);
+	Delegate.fetchProperties = function (oTable) {
+		var oPayload = oTable.getPayload && oTable.getPayload();
+		var sEntity = (oPayload && oPayload.collectionPath) || "/Products";
+		return MetadataDriven.fetchTableProperties(oTable, sEntity);
 	};
 
 	Delegate.updateBindingInfo = function (oTable, oBindingInfo) {

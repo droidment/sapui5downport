@@ -12,9 +12,14 @@
 		data-sap-ui-compat-version="edge"
 		data-sap-ui-async="true"
 		data-sap-ui-resource-roots='{"downport": "./"}'
-		data-sap-ui-on-init="module:downport/index">
+		data-sap-ui-on-init="module:sap/ui/core/ComponentSupport">
 	</script>
 </head>
 <body class="sapUiBody" id="content">
+	<div data-sap-ui-component
+		data-name="downport"
+		data-manifest="true"
+		data-height="100%"
+		data-settings='{"id":"downport"}'></div>
 </body>
 </html>
